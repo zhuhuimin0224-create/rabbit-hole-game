@@ -119,11 +119,8 @@ export class InputManager {
 
     if (dist < this._touchDead) { this._dir = { x: 0, z: 0 }; return; }
 
-    const clamped = Math.min(dist, this._touchMaxPx);
-    const strength = (clamped - this._touchDead) / (this._touchMaxPx - this._touchDead);
-
-    this._dir.x = (dx / dist) * strength;
-    this._dir.z = (dy / dist) * strength;
+    this._dir.x = dx / dist;
+    this._dir.z = dy / dist;
 
     if (dist > this._touchMaxPx * 1.3) {
       const pull = dist - this._touchMaxPx * 1.3;
@@ -147,11 +144,8 @@ export class InputManager {
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < this._mouseDead) { this._dir = { x: 0, z: 0 }; return; }
 
-    const clamped = Math.min(dist, this._mouseMaxPx);
-    const strength = (clamped - this._mouseDead) / (this._mouseMaxPx - this._mouseDead);
-
-    this._dir.x = (dx / dist) * strength;
-    this._dir.z = (dy / dist) * strength;
+    this._dir.x = dx / dist;
+    this._dir.z = dy / dist;
 
     if (dist > this._mouseMaxPx * 1.3) {
       const pull = dist - this._mouseMaxPx * 1.3;
