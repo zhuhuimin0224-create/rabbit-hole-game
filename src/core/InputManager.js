@@ -9,11 +9,9 @@ export class InputManager {
     this._mouseOrigin = { x: 0, y: 0 };
     this._keys = new Set();
 
-    this._touchDead = 14;
-    this._touchMaxPx = 150;
+    this._touchDead = 6;
 
-    this._mouseDead = 12;
-    this._mouseMaxPx = 160;
+    this._mouseDead = 5;
 
     this._joystick = null;
     this._joystickKnob = null;
@@ -121,14 +119,6 @@ export class InputManager {
 
     this._dir.x = dx / dist;
     this._dir.z = dy / dist;
-
-    if (dist > this._touchMaxPx * 1.3) {
-      const pull = dist - this._touchMaxPx * 1.3;
-      this._touchOrigin.x += (dx / dist) * pull * 0.4;
-      this._touchOrigin.y += (dy / dist) * pull * 0.4;
-      this._joystick.style.left = this._touchOrigin.x + 'px';
-      this._joystick.style.top = this._touchOrigin.y + 'px';
-    }
   }
   _onTE() {
     this._touchActive = false;
@@ -146,12 +136,6 @@ export class InputManager {
 
     this._dir.x = dx / dist;
     this._dir.z = dy / dist;
-
-    if (dist > this._mouseMaxPx * 1.3) {
-      const pull = dist - this._mouseMaxPx * 1.3;
-      this._mouseOrigin.x += (dx / dist) * pull * 0.4;
-      this._mouseOrigin.y += (dy / dist) * pull * 0.4;
-    }
   }
   _onMU() { this._mouseActive = false; this._dir = { x: 0, z: 0 }; }
 

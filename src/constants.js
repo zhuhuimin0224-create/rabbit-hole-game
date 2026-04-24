@@ -1,5 +1,5 @@
 export const HOLE_BASE_RADIUS = 0.20;
-export const HOLE_SPEED = 1.5;
+export const HOLE_SPEED = 1.8;
 export const HOLE_SPEED_DECAY = 0.7;
 export const SWALLOW_THRESHOLD = 0.7;
 export const GRAVITY = 15;
