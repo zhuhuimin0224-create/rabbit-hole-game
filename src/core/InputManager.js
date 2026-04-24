@@ -13,8 +13,9 @@ export class InputManager {
     this._touchDead = 10;
     this._touchMaxPx = 100;
 
-    this._mouseSens = 0.008;
-    this._mouseDead = 5;
+    this._mouseSens = 0.003;
+    this._mouseDead = 8;
+    this._mouseMaxPx = 120;
 
     canvas.addEventListener('touchstart', e => this._onTS(e), { passive: false });
     canvas.addEventListener('touchmove', e => this._onTM(e), { passive: false });
@@ -63,11 +64,23 @@ export class InputManager {
   _onMD(e) { this._mouseActive = true; this._mouseOrigin = { x: e.clientX, y: e.clientY }; this._dir = { x: 0, z: 0 }; }
   _onMM(e) {
     if (!this._mouseActive) return;
-    const dx = e.clientX - this._mouseOrigin.x;
-    const dy = e.clientY - this._mouseOrigin.y;
-    if (Math.sqrt(dx * dx + dy * dy) < this._mouseDead) { this._dir = { x: 0, z: 0 }; return; }
-    this._dir.x = THREE.MathUtils.clamp(dx * this._mouseSens, -1, 1);
-    this._dir.z = THREE.MathUtils.clamp(dy * this._mouseSens, -1, 1);
+    let dx = e.clientX - this._mouseOrigin.x;
+    let dy = e.clientY - this._mouseOrigin.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < this._mouseDead) { this._dir = { x: 0, z: 0 }; return; }
+
+    const clamped = Math.min(dist, this._mouseMaxPx);
+    const strength = (clamped - this._mouseDead) / (this._mouseMaxPx - this._mouseDead);
+    const smoothed = strength * strength;
+
+    this._dir.x = (dx / dist) * smoothed;
+    this._dir.z = (dy / dist) * smoothed;
+
+    if (dist > this._mouseMaxPx * 1.3) {
+      const pull = dist - this._mouseMaxPx * 1.3;
+      this._mouseOrigin.x += (dx / dist) * pull * 0.4;
+      this._mouseOrigin.y += (dy / dist) * pull * 0.4;
+    }
   }
   _onMU() { this._mouseActive = false; this._dir = { x: 0, z: 0 }; }
 
