@@ -16,6 +16,8 @@ export class Hole {
     this._bounds = { minX: -50, maxX: 50, minZ: -50, maxZ: 50 };
     this._swirlAngle = 0;
     this._pulseTime = 0;
+    this._velX = 0;
+    this._velZ = 0;
 
     this._buildVisuals();
     this._updateScale();
@@ -131,8 +133,15 @@ export class Hole {
 
   move(dx, dz, dt) {
     const speed = HOLE_SPEED / (0.7 + this.radius * HOLE_SPEED_DECAY);
-    this.position.x += dx * speed * dt;
-    this.position.z += dz * speed * dt;
+    const targetVX = dx * speed;
+    const targetVZ = dz * speed;
+
+    const lerp = 1 - Math.pow(0.05, dt);
+    this._velX += (targetVX - this._velX) * lerp;
+    this._velZ += (targetVZ - this._velZ) * lerp;
+
+    this.position.x += this._velX * dt;
+    this.position.z += this._velZ * dt;
     this.position.x = THREE.MathUtils.clamp(
       this.position.x, this._bounds.minX + this.radius, this._bounds.maxX - this.radius
     );
@@ -283,6 +292,8 @@ export class Hole {
     this.itemsEaten = 0;
     this.totalXP = 0;
     this.position.set(0, 0, 0);
+    this._velX = 0;
+    this._velZ = 0;
     this._updateScale();
     this._updateTeeth();
   }
