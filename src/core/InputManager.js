@@ -43,13 +43,19 @@ export class InputManager {
 
     const arrows = document.createElement('div');
     arrows.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
-    const arrowStyle = 'position:absolute;color:rgba(255,255,255,0.2);font-size:16px;line-height:1;';
-    arrows.innerHTML = `
-      <span style="${arrowStyle}top:6px;left:50%;transform:translateX(-50%);">▲</span>
-      <span style="${arrowStyle}bottom:6px;left:50%;transform:translateX(-50%);">▼</span>
-      <span style="${arrowStyle}left:8px;top:50%;transform:translateY(-50%);">◀</span>
-      <span style="${arrowStyle}right:8px;top:50%;transform:translateY(-50%);">▶</span>
-    `;
+    const tri = (t, l, r, b, dir) => {
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:0;height:0;${t}${l}${r}${b}`;
+      if (dir === 'up') d.style.cssText += 'border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:8px solid rgba(255,255,255,0.22);';
+      if (dir === 'down') d.style.cssText += 'border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid rgba(255,255,255,0.22);';
+      if (dir === 'left') d.style.cssText += 'border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:8px solid rgba(255,255,255,0.22);';
+      if (dir === 'right') d.style.cssText += 'border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid rgba(255,255,255,0.22);';
+      return d;
+    };
+    arrows.appendChild(tri('top:8px;', 'left:50%;transform:translateX(-50%);', '', '', 'up'));
+    arrows.appendChild(tri('', 'left:50%;transform:translateX(-50%);', '', 'bottom:8px;', 'down'));
+    arrows.appendChild(tri('top:50%;transform:translateY(-50%);', 'left:10px;', '', '', 'left'));
+    arrows.appendChild(tri('top:50%;transform:translateY(-50%);', '', 'right:10px;', '', 'right'));
     base.appendChild(arrows);
 
     const knob = document.createElement('div');
@@ -115,10 +121,9 @@ export class InputManager {
 
     const clamped = Math.min(dist, this._touchMaxPx);
     const strength = (clamped - this._touchDead) / (this._touchMaxPx - this._touchDead);
-    const smoothed = strength * strength;
 
-    this._dir.x = (dx / dist) * smoothed;
-    this._dir.z = (dy / dist) * smoothed;
+    this._dir.x = (dx / dist) * strength;
+    this._dir.z = (dy / dist) * strength;
 
     if (dist > this._touchMaxPx * 1.3) {
       const pull = dist - this._touchMaxPx * 1.3;
@@ -144,10 +149,9 @@ export class InputManager {
 
     const clamped = Math.min(dist, this._mouseMaxPx);
     const strength = (clamped - this._mouseDead) / (this._mouseMaxPx - this._mouseDead);
-    const smoothed = strength * strength;
 
-    this._dir.x = (dx / dist) * smoothed;
-    this._dir.z = (dy / dist) * smoothed;
+    this._dir.x = (dx / dist) * strength;
+    this._dir.z = (dy / dist) * strength;
 
     if (dist > this._mouseMaxPx * 1.3) {
       const pull = dist - this._mouseMaxPx * 1.3;
