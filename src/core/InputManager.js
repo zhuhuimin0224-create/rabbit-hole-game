@@ -10,12 +10,12 @@ export class InputManager {
     this._keys = new Set();
 
     this._touchSens = 0.003;
-    this._touchDead = 10;
-    this._touchMaxPx = 100;
+    this._touchDead = 14;
+    this._touchMaxPx = 150;
 
     this._mouseSens = 0.003;
-    this._mouseDead = 8;
-    this._mouseMaxPx = 120;
+    this._mouseDead = 12;
+    this._mouseMaxPx = 160;
 
     canvas.addEventListener('touchstart', e => this._onTS(e), { passive: false });
     canvas.addEventListener('touchmove', e => this._onTM(e), { passive: false });

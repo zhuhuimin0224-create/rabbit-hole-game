@@ -136,7 +136,7 @@ export class Hole {
     const targetVX = dx * speed;
     const targetVZ = dz * speed;
 
-    const lerp = 1 - Math.pow(0.05, dt);
+    const lerp = 1 - Math.pow(0.01, dt);
     this._velX += (targetVX - this._velX) * lerp;
     this._velZ += (targetVZ - this._velZ) * lerp;
 
