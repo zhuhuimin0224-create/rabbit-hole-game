@@ -8,8 +8,13 @@ export class InputManager {
     this._mouseActive = false;
     this._mouseOrigin = { x: 0, y: 0 };
     this._keys = new Set();
-    this._sens = 0.008;
-    this._dead = 5;
+
+    this._touchSens = 0.003;
+    this._touchDead = 10;
+    this._touchMaxPx = 100;
+
+    this._mouseSens = 0.008;
+    this._mouseDead = 5;
 
     canvas.addEventListener('touchstart', e => this._onTS(e), { passive: false });
     canvas.addEventListener('touchmove', e => this._onTM(e), { passive: false });
@@ -25,7 +30,7 @@ export class InputManager {
   _onTS(e) {
     e.preventDefault();
     const t = e.touches[0];
-    if (t.clientY > window.innerHeight * 0.3) {
+    if (t.clientY > window.innerHeight * 0.25) {
       this._touchActive = true;
       this._touchOrigin = { x: t.clientX, y: t.clientY };
       this._dir = { x: 0, z: 0 };
@@ -35,11 +40,23 @@ export class InputManager {
     e.preventDefault();
     if (!this._touchActive) return;
     const t = e.touches[0];
-    const dx = t.clientX - this._touchOrigin.x;
-    const dy = t.clientY - this._touchOrigin.y;
-    if (Math.sqrt(dx * dx + dy * dy) < this._dead) { this._dir = { x: 0, z: 0 }; return; }
-    this._dir.x = THREE.MathUtils.clamp(dx * this._sens, -1, 1);
-    this._dir.z = THREE.MathUtils.clamp(dy * this._sens, -1, 1);
+    let dx = t.clientX - this._touchOrigin.x;
+    let dy = t.clientY - this._touchOrigin.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < this._touchDead) { this._dir = { x: 0, z: 0 }; return; }
+
+    const clamped = Math.min(dist, this._touchMaxPx);
+    const strength = (clamped - this._touchDead) / (this._touchMaxPx - this._touchDead);
+    const smoothed = strength * strength;
+
+    this._dir.x = (dx / dist) * smoothed;
+    this._dir.z = (dy / dist) * smoothed;
+
+    if (dist > this._touchMaxPx * 1.3) {
+      const pull = dist - this._touchMaxPx * 1.3;
+      this._touchOrigin.x += (dx / dist) * pull * 0.4;
+      this._touchOrigin.y += (dy / dist) * pull * 0.4;
+    }
   }
   _onTE() { this._touchActive = false; this._dir = { x: 0, z: 0 }; }
 
@@ -48,9 +65,9 @@ export class InputManager {
     if (!this._mouseActive) return;
     const dx = e.clientX - this._mouseOrigin.x;
     const dy = e.clientY - this._mouseOrigin.y;
-    if (Math.sqrt(dx * dx + dy * dy) < this._dead) { this._dir = { x: 0, z: 0 }; return; }
-    this._dir.x = THREE.MathUtils.clamp(dx * this._sens, -1, 1);
-    this._dir.z = THREE.MathUtils.clamp(dy * this._sens, -1, 1);
+    if (Math.sqrt(dx * dx + dy * dy) < this._mouseDead) { this._dir = { x: 0, z: 0 }; return; }
+    this._dir.x = THREE.MathUtils.clamp(dx * this._mouseSens, -1, 1);
+    this._dir.z = THREE.MathUtils.clamp(dy * this._mouseSens, -1, 1);
   }
   _onMU() { this._mouseActive = false; this._dir = { x: 0, z: 0 }; }
 
