@@ -133,15 +133,8 @@ export class Hole {
 
   move(dx, dz, dt) {
     const speed = HOLE_SPEED / (0.7 + this.radius * HOLE_SPEED_DECAY);
-    const targetVX = dx * speed;
-    const targetVZ = dz * speed;
-
-    const lerp = 1 - Math.pow(0.01, dt);
-    this._velX += (targetVX - this._velX) * lerp;
-    this._velZ += (targetVZ - this._velZ) * lerp;
-
-    this.position.x += this._velX * dt;
-    this.position.z += this._velZ * dt;
+    this.position.x += dx * speed * dt;
+    this.position.z += dz * speed * dt;
     this.position.x = THREE.MathUtils.clamp(
       this.position.x, this._bounds.minX + this.radius, this._bounds.maxX - this.radius
     );
